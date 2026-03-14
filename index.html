@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Free QBO Journal Entry Tool | Hoffbeck + Co</title>
+<meta name="description" content="Instantly look up the correct QuickBooks journal entry for any transaction. Free bookkeeping tool from Hoffbeck + Co." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --cream: #F5F2EC; --warm-white: #FDFCF9; --charcoal: #1E1E1A; --mid: #5C5C56; --soft: #9C9C94;
+    --border: #E0DDD6; --accent: #2E4A3A; --accent-light: #EAF0EC; --accent-mid: #4A7A5C;
+    --amber: #C8813A; --amber-light: #FDF3E8; --dr-bg: #EAF0EC; --dr-text: #2E4A3A;
+    --cr-bg: #E8EDF5; --cr-text: #2C3E6A;
+    --font-serif: 'DM Serif Display', Georgia, serif; --font-sans: 'DM Sans', system-ui, sans-serif;
+    --radius: 8px; --radius-lg: 14px; --shadow: 0 1px 3px rgba(0,0,0,0.07), 0 4px 16px rgba(0,0,0,0.04);
+  }
+  html { font-size: 16px; }
+  body { font-family: var(--font-sans); background: var(--cream); color: var(--charcoal); min-height: 100vh; line-height: 1.6; }
+
+  nav { background: var(--warm-white); border-bottom: 1px solid var(--border); padding: 0 2rem; height: 58px; display: flex; align-items: center; justify-content: space-between; }
+  .nav-logo { font-family: var(--font-serif); font-size: 18px; color: var(--charcoal); text-decoration: none; }
+  .nav-logo span { color: var(--accent); }
+  .nav-cta { font-size: 13px; font-weight: 500; color: var(--accent); text-decoration: none; border: 1px solid var(--accent); padding: 6px 16px; border-radius: 40px; transition: background 0.15s, color 0.15s; }
+  .nav-cta:hover { background: var(--accent); color: white; }
+
+  .hero { background: var(--warm-white); border-bottom: 1px solid var(--border); padding: 52px 2rem 48px; text-align: center; }
+  .hero-eyebrow { font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent-mid); margin-bottom: 14px; }
+  .hero h1 { font-family: var(--font-serif); font-size: clamp(32px, 5vw, 52px); font-weight: 400; line-height: 1.1; color: var(--charcoal); margin-bottom: 18px; max-width: 680px; margin-left: auto; margin-right: auto; }
+  .hero h1 em { font-style: italic; color: var(--accent); }
+  .hero p { font-size: 16px; color: var(--mid); max-width: 520px; margin: 0 auto 10px; font-weight: 300; line-height: 1.7; }
+  .hero-note { font-size: 12px; color: var(--soft); margin-top: 16px; font-style: italic; }
+
+  .main { max-width: 840px; margin: 0 auto; padding: 40px 1.5rem 80px; }
+
+  .tabs { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 32px; }
+  .tab-btn { font-family: var(--font-sans); font-size: 14px; font-weight: 500; color: var(--soft); background: none; border: none; border-bottom: 2px solid transparent; padding: 10px 20px; cursor: pointer; margin-bottom: -1px; transition: color 0.15s; }
+  .tab-btn.active { color: var(--charcoal); border-bottom-color: var(--accent); }
+  .tab-btn:hover { color: var(--charcoal); }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+  .chip-label { font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--soft); width: 100%; margin-bottom: 4px; }
+  .chip { font-size: 13px; color: var(--mid); background: var(--warm-white); border: 1px solid var(--border); border-radius: 40px; padding: 6px 14px; cursor: pointer; transition: all 0.15s; font-family: var(--font-sans); }
+  .chip:hover { background: var(--accent-light); border-color: var(--accent-mid); color: var(--accent); }
+
+  .input-row { display: flex; gap: 10px; align-items: flex-start; }
+  textarea { flex: 1; font-family: var(--font-sans); font-size: 15px; font-weight: 300; color: var(--charcoal); background: var(--warm-white); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 16px; resize: vertical; min-height: 80px; line-height: 1.6; transition: border-color 0.15s; }
+  textarea:focus { outline: none; border-color: var(--accent-mid); }
+  textarea::placeholder { color: var(--soft); }
+
+  .btn { font-family: var(--font-sans); font-size: 14px; font-weight: 500; background: var(--accent); color: white; border: none; border-radius: var(--radius); padding: 12px 22px; cursor: pointer; white-space: nowrap; transition: background 0.15s; }
+  .btn:hover { background: #243d2f; }
+  .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  .result { margin-top: 28px; }
+  .result-section { margin-bottom: 20px; }
+  .section-label { font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--soft); margin-bottom: 10px; }
+
+  .summary-box { background: var(--warm-white); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: var(--radius); padding: 16px 20px; font-size: 15px; color: var(--charcoal); font-weight: 300; line-height: 1.7; }
+
+  .je-card { background: var(--warm-white); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow); }
+  .je-header { background: var(--cream); border-bottom: 1px solid var(--border); padding: 12px 20px; display: grid; grid-template-columns: 1fr 60px 80px; gap: 8px; font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--soft); }
+  .je-row { display: grid; grid-template-columns: 1fr 60px 80px; gap: 8px; padding: 13px 20px; border-bottom: 1px solid var(--border); align-items: baseline; }
+  .je-row:last-child { border-bottom: none; }
+  .je-account { font-size: 14px; color: var(--charcoal); }
+  .je-account.cr { padding-left: 18px; color: var(--mid); }
+  .badge { display: inline-block; font-size: 10px; font-weight: 500; letter-spacing: 0.06em; padding: 3px 8px; border-radius: 4px; }
+  .badge-dr { background: var(--dr-bg); color: var(--dr-text); }
+  .badge-cr { background: var(--cr-bg); color: var(--cr-text); }
+  .je-amount { font-size: 14px; font-variant-numeric: tabular-nums; text-align: right; color: var(--charcoal); }
+  .je-note { grid-column: 1 / -1; font-size: 12px; color: var(--soft); margin-top: -6px; padding-bottom: 2px; font-style: italic; }
+
+  .impact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .impact-card { background: var(--warm-white); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; }
+  .impact-card .ic-label { font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--soft); margin-bottom: 8px; }
+  .impact-card .ic-text { font-size: 14px; color: var(--charcoal); font-weight: 300; line-height: 1.6; }
+
+  /* STATEMENT VISUAL */
+  .stmt-viz { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .stmt-viz.single { grid-template-columns: 1fr; max-width: 420px; }
+  .stmt-mini { background: var(--warm-white); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
+  .stmt-mini-title { padding: 10px 16px; font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; border-bottom: 1px solid var(--border); }
+  .stmt-mini-title.pl-title { background: var(--amber-light); color: #7A4E1A; }
+  .stmt-mini-title.bs-title { background: var(--accent-light); color: var(--accent); }
+  .stmt-viz-section { font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--soft); padding: 7px 16px 4px; background: var(--cream); border-top: 1px solid var(--border); }
+  .stmt-viz-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 16px; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .stmt-viz-row:last-child { border-bottom: none; }
+  .stmt-viz-row.highlighted { background: rgba(253,252,249,0.8); }
+  .stmt-viz-row.total-row { background: var(--cream); border-top: 1px solid var(--border); font-weight: 500; }
+  .row-label { color: var(--charcoal); }
+  .dir { font-size: 11px; font-weight: 500; white-space: nowrap; padding: 2px 8px; border-radius: 4px; }
+  .dir.up { color: #1F5C3A; background: #DDF0E6; }
+  .dir.down { color: #7A3A1A; background: #FDE8D8; }
+  .dir.flat { color: var(--soft); background: var(--cream); }
+
+  .statements-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .stmt-badge { font-size: 12px; font-weight: 500; padding: 5px 14px; border-radius: 40px; border: 1px solid var(--border); color: var(--mid); background: var(--warm-white); }
+  .stmt-badge.pl { background: var(--amber-light); color: var(--amber); border-color: #EDD4B2; }
+  .stmt-badge.bs { background: var(--accent-light); color: var(--accent); border-color: #C0D4C8; }
+
+  .accounts-box { background: var(--warm-white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .account-row { display: grid; grid-template-columns: 1fr 80px auto; gap: 8px; padding: 11px 16px; border-bottom: 1px solid var(--border); align-items: center; font-size: 13px; }
+  .account-row:last-child { border-bottom: none; }
+  .account-name { color: var(--charcoal); }
+  .account-stmt { color: var(--soft); font-size: 12px; }
+  .account-line { color: var(--mid); font-size: 12px; text-align: right; }
+
+  .qbo-box { background: var(--amber-light); border: 1px solid #EDD4B2; border-radius: var(--radius); padding: 14px 18px; font-size: 14px; color: #7A4E1A; font-weight: 300; line-height: 1.7; }
+  .qbo-box strong { font-weight: 500; color: #5C3A10; }
+
+  .no-match { background: var(--warm-white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 32px; text-align: center; }
+  .no-match p { font-size: 15px; color: var(--mid); font-weight: 300; line-height: 1.7; }
+  .no-match strong { color: var(--charcoal); font-weight: 500; }
+
+  .ref-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 32px; }
+  .ref-card { background: var(--warm-white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px; }
+  .ref-card-header { font-size: 13px; font-weight: 500; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+  .ref-card-header.dr { color: var(--dr-text); }
+  .ref-card-header.cr { color: var(--cr-text); }
+  .ref-item { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .ref-item:last-child { border-bottom: none; }
+  .ref-item-name { color: var(--charcoal); }
+  .ref-item-tag { font-size: 11px; color: var(--soft); }
+
+  .dealer-box { background: var(--accent); border-radius: var(--radius-lg); padding: 24px 28px; margin-bottom: 32px; }
+  .dealer-label { font-size: 10px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.55); margin-bottom: 14px; }
+  .dealer-row { display: flex; align-items: baseline; gap: 6px; margin-bottom: 8px; }
+  .dealer-row:last-child { margin-bottom: 0; }
+  .dealer-letters { font-family: var(--font-serif); font-size: 22px; color: white; min-width: 160px; letter-spacing: 0.06em; }
+  .dealer-letters span { opacity: 0.45; font-size: 16px; }
+  .dealer-desc { font-size: 13px; color: rgba(255,255,255,0.65); }
+
+  .common-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 32px; }
+  .common-card { background: var(--warm-white); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
+  .common-title { font-size: 13px; font-weight: 500; color: var(--charcoal); margin-bottom: 8px; }
+  .common-desc { font-size: 12px; color: var(--mid); font-weight: 300; line-height: 1.6; }
+
+  footer { background: var(--charcoal); color: rgba(255,255,255,0.5); text-align: center; padding: 32px 2rem; font-size: 13px; font-weight: 300; }
+  footer a { color: rgba(255,255,255,0.7); text-decoration: none; }
+  footer a:hover { color: white; }
+  .footer-logo { font-family: var(--font-serif); font-size: 20px; color: white; margin-bottom: 10px; display: block; }
+
+  .loading { display: flex; align-items: center; gap: 10px; padding: 24px 0; font-size: 14px; color: var(--soft); font-weight: 300; }
+  .dots { display: flex; gap: 4px; }
+  .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--soft); animation: blink 1.2s ease-in-out infinite; }
+  .dot:nth-child(2) { animation-delay: 0.2s; }
+  .dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes blink { 0%,80%,100%{opacity:0.2} 40%{opacity:1} }
+
+  @media (max-width: 600px) {
+    .ref-grid, .common-grid, .impact-grid, .stmt-viz { grid-template-columns: 1fr; }
+    .stmt-viz.single { max-width: 100%; }
+    .je-header, .je-row { grid-template-columns: 1fr 50px 70px; }
+    nav { padding: 0 1rem; }
+    .hero { padding: 36px 1rem 32px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="https://www.hoffbeck.co">Hoffbeck <span>+</span> Co</a>
+  <a class="nav-cta" href="https://www.hoffbeck.co/schedule-a-call" target="_blank">Schedule a Call</a>
+</nav>
+
+<div class="hero">
+  <p class="hero-eyebrow">Free Tool from Hoffbeck + Co</p>
+  <h1>The <em>QBO Journal Entry</em> Tool</h1>
+  <p>Describe any transaction or bookkeeping issue in plain English. Get the correct QuickBooks adjusting journal entry instantly — with the impact on your P&amp;L and Balance Sheet.</p>
+  <p class="hero-note">* We are not collecting any of your data. Nothing you enter is stored or visible to us. This is a free resource to help small business owners and bookkeepers get their books right.</p>
+</div>
+
+<div class="main">
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('generator',this)">JE Generator</button>
+    <button class="tab-btn" onclick="switchTab('reference',this)">Debit / Credit Reference</button>
+  </div>
+
+  <div class="tab-panel active" id="panel-generator">
+    <div class="chips">
+      <span class="chip-label">Quick examples</span>
+      <span class="chip" onclick="useChip(this)">Move loan payment to interest expense</span>
+      <span class="chip" onclick="useChip(this)">Record an owner distribution</span>
+      <span class="chip" onclick="useChip(this)">Accrue unpaid wages at month end</span>
+      <span class="chip" onclick="useChip(this)">Record depreciation on a vehicle</span>
+      <span class="chip" onclick="useChip(this)">Owner contributed cash to the business</span>
+      <span class="chip" onclick="useChip(this)">Invoice a client for $1,500</span>
+      <span class="chip" onclick="useChip(this)">Client paid their invoice</span>
+      <span class="chip" onclick="useChip(this)">Buy equipment with a loan</span>
+      <span class="chip" onclick="useChip(this)">Record a prepaid insurance payment</span>
+      <span class="chip" onclick="useChip(this)">Write off a bad debt</span>
+      <span class="chip" onclick="useChip(this)">Record deferred revenue from a deposit</span>
+      <span class="chip" onclick="useChip(this)">Reclassify a miscoded expense</span>
+      <span class="chip" onclick="useChip(this)">Gross up revenue for Stripe processing fees</span>
+      <span class="chip" onclick="useChip(this)">Owner paid business expense from personal card</span>
+      <span class="chip" onclick="useChip(this)">Owner used business card for personal expense</span>
+      <span class="chip" onclick="useChip(this)">Clear stale uncleared transactions at year end</span>
+      <span class="chip" onclick="useChip(this)">Clear the Ask My Accountant suspense account</span>
+      <span class="chip" onclick="useChip(this)">Reconcile sales tax payable</span>
+      <span class="chip" onclick="useChip(this)">Shopify deposit didn't split out sales tax</span>
+      <span class="chip" onclick="useChip(this)">Pay and remit sales tax to the state</span>
+    </div>
+    <div class="input-row">
+      <textarea id="je-input" placeholder="Describe what you need to record or fix. Example: I paid $1,200 for a 12-month insurance policy upfront and need to record it correctly..."></textarea>
+      <button class="btn" id="gen-btn" onclick="generateJE()">Look Up JE</button>
+    </div>
+    <div id="je-output"></div>
+  </div>
+
+  <div class="tab-panel" id="panel-reference">
+    <div class="dealer-box">
+      <div class="dealer-label">The DEALER Mnemonic — What Goes Up</div>
+      <div class="dealer-row">
+        <div class="dealer-letters"><strong>D</strong><span>ividends</span> &nbsp;<strong>E</strong><span>xpenses</span> &nbsp;<strong>A</strong><span>ssets</span></div>
+        <div class="dealer-desc">Debit to increase</div>
+      </div>
+      <div class="dealer-row">
+        <div class="dealer-letters"><strong>L</strong><span>iabilities</span> &nbsp;<strong>E</strong><span>quity</span> &nbsp;<strong>R</strong><span>evenue</span></div>
+        <div class="dealer-desc">Credit to increase</div>
+      </div>
+    </div>
+    <div class="ref-grid">
+      <div class="ref-card">
+        <div class="ref-card-header dr">Debit increases these accounts</div>
+        <div class="ref-item"><span class="ref-item-name">Assets</span><span class="ref-item-tag">Cash, AR, Equipment, Prepaid</span></div>
+        <div class="ref-item"><span class="ref-item-name">Expenses</span><span class="ref-item-tag">P&amp;L</span></div>
+        <div class="ref-item"><span class="ref-item-name">Distributions / Draws</span><span class="ref-item-tag">Contra-equity</span></div>
+        <div class="ref-item"><span class="ref-item-name">Dividends</span><span class="ref-item-tag">Contra-equity</span></div>
+        <div class="ref-item"><span class="ref-item-name">Accumulated Depreciation</span><span class="ref-item-tag">To clear contra-asset</span></div>
+        <div class="ref-item"><span class="ref-item-name">COGS</span><span class="ref-item-tag">P&amp;L</span></div>
+      </div>
+      <div class="ref-card">
+        <div class="ref-card-header cr">Credit increases these accounts</div>
+        <div class="ref-item"><span class="ref-item-name">Liabilities</span><span class="ref-item-tag">AP, Loans, Credit Cards</span></div>
+        <div class="ref-item"><span class="ref-item-name">Equity</span><span class="ref-item-tag">Owner's Capital, Retained Earnings</span></div>
+        <div class="ref-item"><span class="ref-item-name">Revenue</span><span class="ref-item-tag">P&amp;L</span></div>
+        <div class="ref-item"><span class="ref-item-name">Accumulated Depreciation</span><span class="ref-item-tag">Contra-asset, Balance Sheet</span></div>
+        <div class="ref-item"><span class="ref-item-name">Deferred Revenue</span><span class="ref-item-tag">Liability until earned</span></div>
+        <div class="ref-item"><span class="ref-item-name">Accrued Liabilities</span><span class="ref-item-tag">Expenses incurred not yet paid</span></div>
+      </div>
+    </div>
+    <p class="section-label">Common QBO Adjusting Entries</p>
+    <div class="common-grid">
+      <div class="common-card"><div class="common-title">Prepaid Expense</div><div class="common-desc">When paid: DR Prepaid / CR Cash. Each period as used: DR Expense / CR Prepaid.</div></div>
+      <div class="common-card"><div class="common-title">Deferred Revenue</div><div class="common-desc">When collected: DR Cash / CR Deferred Revenue. When earned: DR Deferred Revenue / CR Revenue.</div></div>
+      <div class="common-card"><div class="common-title">Loan Payment Split</div><div class="common-desc">DR Loan Payable (principal) + DR Interest Expense (interest) / CR Cash (total payment).</div></div>
+      <div class="common-card"><div class="common-title">Accrued Expense</div><div class="common-desc">DR Expense / CR Accrued Liability. Reversed when paid in the following period.</div></div>
+      <div class="common-card"><div class="common-title">Depreciation</div><div class="common-desc">DR Depreciation Expense / CR Accumulated Depreciation. Never credit the asset directly.</div></div>
+      <div class="common-card"><div class="common-title">Year-End Close</div><div class="common-desc">DR Retained Earnings / CR Distributions (to zero out draws). Revenue and expense accounts close to Retained Earnings.</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <span class="footer-logo">Hoffbeck + Co</span>
+  Built Right. Connected Deep.<br /><br />
+  Based in Oceanside, CA &nbsp;·&nbsp; Serving Small Businesses Everywhere<br />
+  <a href="https://www.hoffbeck.co/schedule-a-call" target="_blank">Schedule a Call</a> &nbsp;·&nbsp;
+  <a href="https://www.hoffbeck.co" target="_blank">hoffbeck.co</a><br /><br />
+  <small>© 2025 Hoffbeck + Co, LLC. All rights reserved.</small>
+</footer>
+
+<script>
+  function switchTab(name, btn) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-' + name).classList.add('active');
+  }
+  function useChip(el) { document.getElementById('je-input').value = el.textContent.trim(); }
+
+  // viz: { stmt:'P&L'|'BS', section:'Section Name' (blank = total row), label, dir:'up'|'down'|'flat' }
+  const JE_LIBRARY = [
+    {
+      keywords:['loan','interest','principal','split','payment','amortize'],
+      title:'Loan Payment Split — Principal + Interest',
+      entries:[
+        {type:'DR',account:'Loan Payable',amount:'$XXX.XX (principal portion)',note:'Reduces the loan balance on your Balance Sheet'},
+        {type:'DR',account:'Interest Expense',amount:'$XXX.XX (interest portion)',note:'Records the cost of borrowing on your P&L'},
+        {type:'CR',account:'Cash / Checking',amount:'$XXX.XX (total payment)',note:'Full payment leaving your bank account'},
+      ],
+      before:'The entire loan payment was likely hitting one account (e.g. all to the loan or all to an expense), mis-stating both your liabilities and your P&L.',
+      after:'Liabilities are reduced by the principal amount only. Interest expense appears correctly on your P&L. Your Balance Sheet and P&L both reflect reality.',
+      statements:['P&L','Balance Sheet'],
+      accounts:[
+        {name:'Loan Payable',statement:'Balance Sheet',line:'Long-term Liabilities'},
+        {name:'Interest Expense',statement:'P&L',line:'Expenses'},
+        {name:'Cash',statement:'Balance Sheet',line:'Current Assets'},
+      ],
+      viz:[
+        {stmt:'P&L',section:'Expenses',label:'Interest Expense',dir:'up'},
+        {stmt:'P&L',section:'',label:'Net Income',dir:'down'},
+        {stmt:'BS',section:'Current Assets',label:'Cash',dir:'down'},
+        {stmt:'BS',section:'Long-term Liabilities',label:'Loan Payable',dir:'down'},
+      ],
+      qbo:'<strong>In QBO:</strong> Go to + New > Journal Entry. Use the amortization schedule from your lender to get the exact principal/interest split for each payment. If you have months of uncorrected payments, create one JE per month to keep your records clean.'
+    },
+    {
+      keywords:['distribution','draw','owner draw','owner distribution','withdraw'],
+      title:'Owner Distribution / Draw',
+      entries:[
+        {type:'DR',account:"Owner's Draw / Distributions",amount:'$X,XXX.XX',note:'Contra-equity account — reduces owner equity'},
+        {type:'CR',account:'Cash / Checking',amount:'$X,XXX.XX',note:'Cash leaving the business'},
+      ],
+      before:'The distribution may have been recorded as an expense (incorrectly reducing net income) or not recorded at all.',
+      after:'Cash is reduced. Distributions show as a separate line in the equity section of your Balance Sheet — not as a business expense on your P&L. Net income is unaffected.',
+      statements:['Balance Sheet'],
+      accounts:[
+        {name:"Distributions / Owner's Draw",statement:'Balance Sheet',line:'Equity Section'},
+        {name:'Cash',statement:'Balance Sheet',line:'Current Assets'},
+      ],
+      viz:[
+        {stmt:'BS',section:'Current Assets',label:'Cash',dir:'down'},
+        {stmt:'BS',section:'Equity',label:'Distributions (contra-equity)',dir:'up'},
+        {stmt:'BS',section:'',label:'Total Equity',dir:'down'},
+      ],
+      qbo:"<strong>In QBO:</strong> Go to + New > Journal Entry. At year-end, a closing entry will DR Retained Earnings / CR Distributions to zero out the distributions account. Sole props and LLCs use \"Owner's Draw\" — S-Corps use \"Distributions.\" Keep these separate from payroll salary."
+    },
+    {
+      keywords:['accrue','accrual','wages','payroll accrual','unpaid','month end','period end','earned not paid'],
+      title:'Accrued Wages / Payroll Accrual',
+      entries:[
+        {type:'DR',account:'Wages / Salaries Expense',amount:'$X,XXX.XX',note:'Expense hits the period in which work was performed'},
+        {type:'CR',account:'Accrued Wages Payable',amount:'$X,XXX.XX',note:'Liability — owed to employees, not yet paid'},
+      ],
+      before:'Wages earned in this period but paid next period were not recorded, understating expenses and liabilities for the current period.',
+      after:'Expense is matched to the correct period (matching principle). A liability appears on your Balance Sheet until payroll clears the bank.',
+      statements:['P&L','Balance Sheet'],
+      accounts:[
+        {name:'Wages Expense',statement:'P&L',line:'Operating Expenses'},
+        {name:'Accrued Wages Payable',statement:'Balance Sheet',line:'Current Liabilities'},
+      ],
+      viz:[
+        {stmt:'P&L',section:'Expenses',label:'Wages Expense',dir:'up'},
+        {stmt:'P&L',section:'',label:'Net Income',dir:'down'},
+        {stmt:'BS',section:'Current Liabilities',label:'Accrued Wages Payable',dir:'up'},
+      ],
+      qbo:"<strong>In QBO:</strong> Create this JE on the last day of the period. When payroll actually runs and cash goes out, reverse this entry (or let QBO auto-reverse if you set that up) so wages aren't double-counted."
+    },
+    {
+      keywords:['depreciation','depreciate','fixed asset','vehicle depreciation','equipment depreciation','useful life'],
+      title:'Depreciation Entry',
+      entries:[
+        {type:'DR',account:'Depreciation Expense',amount:'$X,XXX.XX',note:'Period expense — hits P&L'},
+        {type:'CR',account:'Accumulated Depreciation',amount:'$X,XXX.XX',note:'Contra-asset — reduces the net book value of the asset'},
+      ],
+      before:'The asset is shown at full purchase cost with no depreciation recorded, overstating assets and understating expenses.',
+      after:'The asset shows at net book value (cost minus accumulated depreciation). Depreciation expense reduces net income correctly for the period.',
+      statements:['P&L','Balance Sheet'],
+      accounts:[
+        {name:'Depreciation Expense',statement:'P&L',line:'Operating Expenses'},
+        {name:'Accumulated Depreciation',statement:'Balance Sheet',line:'Fixed Assets (contra)'},
+        {name:'Asset (Vehicle/Equipment)',statement:'Balance Sheet',line:'Fixed Assets — original cost preserved'},
+      ],
+      viz:[
+        {stmt:'P&L',section:'Expenses',label:'Depreciation Expense',dir:'up'},
+        {stmt:'P&L',section:'',label:'Net Income',dir:'down'},
+        {stmt:'BS',section:'Fixed Assets',label:'Accumulated Depreciation',dir:'up'},
+        {stmt:'BS',section:'Fixed Assets',label:'Net Book Value',dir:'down'},
+      ],
+      qbo:'<strong>In QBO:</strong> Never credit the asset account directly — always use Accumulated Depreciation so you retain the original cost. Run this monthly or annually depending on your method. Your CPA should provide the annual depreciation schedule (straight-line, MACRS, etc.).'
+    },
+    {
+      keywords:['contribution','owner contributed','put money in','invest in business','capital contribution','owner investment'],
+      title:'Owner Capital Contribution',
+      entries:[
+        {type:'DR',account:'Cash / Checking',amount:'$X,XXX.XX',note:'Cash entering the business'},
+        {type:'CR',account:"Owner's Equity / Paid-In Capital",amount:'$X,XXX.XX',note:'Increases owner equity on the Balance Sheet'},
+      ],
+      before:'The deposit may have been coded as revenue or income, incorrectly inflating sales figures on the P&L.',
+      after:'Cash is up. Owner equity is up. The P&L is unaffected — this is a financing event, not revenue.',
+      statements:['Balance Sheet'],
+      accounts:[
+        {name:'Cash',statement:'Balance Sheet',line:'Current Assets'},
+        {name:"Owner's Equity / Paid-In Capital",statement:'Balance Sheet',line:'Equity Section'},
+      ],
+      viz:[
+        {stmt:'BS',section:'Current Assets',label:'Cash',dir:'up'},
+        {stmt:'BS',section:'Equity',label:"Owner's Equity",dir:'up'},
+        {stmt:'BS',section:'',label:'Total Equity',dir:'up'},
+      ],
+      qbo:"<strong>In QBO:</strong> Make sure this does not get categorized as income. Use an Equity account type. For S-Corps this may be \"Additional Paid-In Capital\" or \"Shareholder Contributions\" — confirm with your CPA to protect basis tracking."
+    },
+    {
+      keywords:['invoice','bill client','accounts receivable','ar','revenue earned','unbilled','record invoice','send invoice'],
+      title:'Record Invoice / Recognize Revenue (Accrual)',
+      entries:[
+        {type:'DR',account:'Accounts Receivable (A/R)',amount:'$X,XXX.XX',note:'Asset — client owes you this money'},
+        {type:'CR',account:'Revenue / Sales',amount:'$X,XXX.XX',note:'Revenue recognized when earned, not when paid'},
+      ],
+      before:'Revenue has been earned but not recorded, understating both income and receivables.',
+      after:"A/R appears on the Balance Sheet as an asset. Revenue hits the P&L in the correct period. When the client pays, cash replaces A/R.",
+      statements:['P&L','Balance Sheet'],
+      accounts:[
+        {name:'Accounts Receivable',statement:'Balance Sheet',line:'Current Assets'},
+        {name:'Revenue / Sales',statement:'P&L',line:'Income'},
+      ],
+      viz:[
+        {stmt:'P&L',section:'Income',label:'Revenue / Sales',dir:'up'},
+        {stmt:'P&L',section:'',label:'Net Income',dir:'up'},
+        {stmt:'BS',section:'Current Assets',label:'Accounts Receivable',dir:'up'},
+      ],
+      qbo:"<strong>In QBO:</strong> The standard workflow is + New > Invoice (not a JE). QBO auto-creates this entry when you save an invoice. A JE is used if you're correcting a prior period or recording on the books without QBO's invoice flow."
+    },
+    {
+      keywords:['client paid','payment received','collect receivable','cash received','paid invoice','customer payment','collect ar'],
+      title:'Client Payment Received (Clearing A/R)',
+      entries:[
+        {type:'DR',account:'Cash / Undeposited Funds',amount:'$X,XXX.XX',note:'Cash coming into the business'},
+        {type:'CR',account:'Accounts Receivable (A/R)',amount:'$X,XXX.XX',note:'Removes the receivable — the debt is settled'},
+      ],
+      before:"A/R is still open on the books even though cash has been received, overstating receivables.",
+      after:"A/R is cleared. Cash is up. Revenue was already recognized when the invoice was created — this entry is just the collection.",
+      statements:['Balance Sheet'],
+      accounts:[
+        {name:'Cash / Undeposited Funds',statement:'Balance Sheet',line:'Current Assets'},
+        {name:'Accounts Receivable',statement:'Balance Sheet',line:'Current Assets'},
+      ],
+      viz:[
+        {stmt:'BS',section:'Current Assets',label:'Cash',dir:'up'},
+        {stmt:'BS',section:'Current Assets',label:'Accounts Receivable',dir:'down'},
+        {stmt:'BS',section:'',label:'Total Assets',dir:'flat'},
+      ],
+      qbo:"<strong>In QBO:</strong> Use + New > Receive Payment and match it to the open invoice. This auto-creates the correct JE. Only use a manual JE if correcting a prior-period error or clearing stale A/R."
+    },
+    {
+      keywords:['buy equipment','purchase vehicle','buy a car','buy a truck','buy asset','equipment loan','financed','auto loan','vehicle loan'],
+      title:'Asset Purchase (Financed with Loan)',
+      entries:[
+        {type:'DR',account:'Vehicle / Equipment (Fixed Asset)',amount:'$XX,XXX.XX',note:'Full purchase price recorded as an asset'},
+        {type:'CR',account:'Cash / Checking',amount:'$X,XXX.XX (down payment)',note:'Cash out for the down payment'},
+        {type:'CR',account:'Loan Payable / Notes Payable',amount:'$XX,XXX.XX (financed amount)',note:'Loan balance — a new liability'},
+      ],
+      before:'The purchase may have been expensed entirely (overstating expenses and missing the liability) or not recorded.',
+      after:'The asset is on your Balance Sheet at full cost. The loan is a liability. Equity is unchanged at purchase — the asset and liability offset. Depreciation entries will reduce the asset value over time.',
+      statements:['Balance Sheet'],
+      accounts:[
+        {name:'Vehicle / Equipment',statement:'Balance Sheet',line:'Fixed Assets'},
+        {name:'Loan / Notes Payable',statement:'Balance Sheet',line:'Long-term Liabilities'},
+        {name:'Cash',statement:'Balance Sheet',line:'Current Assets'},
+      ],
+      viz:[
+        {stmt:'BS',section:'Current Assets',label:'Cash (down payment)',dir:'down'},
+        {stmt:'BS',section:'Fixed Assets',label:'Vehicle / Equipment',dir:'up'},
+        {stmt:'BS',section:'Long-term Liabilities',label:'Loan Payable',dir:'up'},
+        {stmt:'BS',section:'',label:'Total Equity',dir:'flat'},
+      ],
+      qbo:'<strong>In QBO:</strong> Set up the fixed asset account first (Chart of Accounts > New > Fixed Asset type). Then create the loan under Long-term Liabilities. Enter the JE manually or through the purchase flow. Set a reminder to run monthly depreciation.'
+    },
+    {
+      keywords:['prepaid','prepay','insurance','subscription','pay in advance','paid upfront','prepaid expense','defer expense'],
+      title:'Prepaid Expense (Pay Now, Expense Later)',
+      entries:[
+        {type:'DR',account:'Prepaid Expense / Prepaid Insurance',amount:'$X,XXX.XX',note:"Asset — you've paid for something not yet used"},
+        {type:'CR',account:'Cash / Checking',amount:'$X,XXX.XX',note:'Cash out at time of payment'},
+      ],
+      before:'The full payment was likely expensed immediately, front-loading all the cost into one period instead of spreading it correctly.',
+      after:'A prepaid asset sits on your Balance Sheet. Each period you record a separate JE: DR Expense / CR Prepaid — gradually consuming the asset as the service is used.',
+      statements:['Balance Sheet','P&L'],
+      accounts:[
+        {name:'Prepaid Expense',statement:'Balance Sheet',line:'Current Assets'},
+        {name:'Cash',statement:'Balance Sheet',line:'Current Assets'},
+        {name:'[Expense Type]',statement:'P&L',line:'Expenses — recognized each period'},
+      ],
+      viz:[
+        {stmt:'BS',section:'Current Assets',label:'Prepaid Expense',dir:'up'},
+        {stmt:'BS',section:'Current Assets',label:'Cash',dir:'down'},
+        {stmt:'P&L',section:'Expenses',label:'[Expense] — each period as used',dir:'up'},
+        {stmt:'P&L',section:'',label:'Net Income',dir:'down'},
+      ],
+      qbo:"<strong>In QBO:</strong> Create a \"Prepaid Expense\" current asset account. Record the initial payment to that account. Then set a recurring monthly JE to move the monthly portion from Prepaid to the appropriate expense account (e.g. Insurance Expense = annual amount ÷ 12)."
+    },
+    {
+      keywords:['bad debt','write off','uncollectible','write-off','bad receivable'],
+      title:'Bad Debt Write-Off',
+      entries:[
+        {type:'DR',account:'Bad Debt Expense',amount:'$X,XXX.XX',note:'Recognizes the loss on the P&L'},
+        {type:'CR',account:'Accounts Receivable (A/R)',amount:'$X,XXX.XX',note:'Removes the uncollectible receivable from the books'},
+      ],
+      before:"A/R is inflated with an amount that will never be collected, overstating assets and not recognizing the loss.",
+      after:"A/R is cleaned up. Bad Debt Expense hits the P&L. Your Balance Sheet reflects what you actually expect to collect.",
+      statements:['P&L','Balance Sheet'],
+      accounts:[
+        {name:'Bad Debt Expense',statement:'P&L',line:'Operating Expenses'},
+        {name:'Accounts Receivable',statement:'Balance Sheet',line:'Current Assets'},
+      ],
+      viz:[
+        {stmt:'P&L',section:'Expenses',label:'Bad Debt Expense',dir:'up'},
+        {stmt:'P&L',section:'',label:'Net Income',dir:'down'},
+        {stmt:'BS',section:'Current Assets',label:'Accounts Receivable',dir:'down'},
+      ],
+      qbo:"<strong>In QBO:</strong> First confirm the client truly won't pay. Go to + New > Journal Entry. If you're on cash basis, you may never have recognized the revenue in the first place — check with your CPA before writing it off, as the tax treatment differs between cash and accrual."
+    },
+    {
+      keywords:['deferred revenue','deposit received','retainer','paid in advance by client','customer deposit','unearned revenue','collect before earning'],
+      title:'Deferred Revenue (Client Pays Before Work is Done)',
+      entries:[
+        {type:'DR',account:'Cash / Checking',amount:'$X,XXX.XX',note:'Cash received from the client'},
+        {type:'CR',account:'Deferred Revenue / Unearned Revenue',amount:'$X,XXX.XX',note:'Liability — you owe the client the service'},
+      ],
+      before:'The payment was recorded as revenue immediately, overstating income before the work is performed.',
+      after:'Cash is up. A liability (Deferred Revenue) sits on the Balance Sheet. As services are delivered, DR Deferred Revenue / CR Revenue to recognize earnings.',
+      statements:['Balance Sheet','P&L'],
+      accounts:[
+        {name:'Cash',statement:'Balance Sheet',line:'Current Assets'},
+        {name:'Deferred Revenue',statement:'Balance Sheet',line:'Current Liabilities'},
+        {name:'Revenue',statement:'P&L',line:'Income — recognized as earned'},
+      ],
+      viz:[
+        {stmt:'BS',section:'Current Assets',label:'Cash',dir:'up'},
+        {stmt:'BS',section:'Current Liabilities',label:'Deferred Revenue',dir:'up'},
+        {stmt:'P&L',section:'Income',label:'Revenue (recognized when earned)',dir:'up'},
+        {stmt:'P&L',section:'',label:'Net Income',dir:'up'},
+      ],
+      qbo:"<strong>In QBO:</strong> Set up a \"Deferred Revenue\" account under Current Liabilities. When you complete the work or deliver the service, record a second JE: DR Deferred Revenue / CR Revenue. This is especially important for retainer clients and deposits."
+    },
+    {
+      keywords:['reclassify','miscoded','wrong account','move expense','coded wrong','wrong category','fix category','correct category','reclass'],
+      title:'Reclassify a Miscoded Expense',
+      entries:[
+        {type:'DR',account:'Correct Expense Account (e.g. Office Supplies)',amount:'$XXX.XX',note:'The account where this expense should live'},
+        {type:'CR',account:'Incorrect Expense Account (e.g. Meals)',amount:'$XXX.XX',note:'Removes the amount from the wrong account'},
+      ],
+      before:'The expense is sitting in the wrong account, distorting your P&L categorization and potentially affecting tax deductions.',
+      after:'The expense moves to the correct account. Both P&L line items are corrected. Net income is unchanged — just the categorization.',
+      statements:['P&L'],
+      accounts:[
+        {name:'Correct Expense Account',statement:'P&L',line:'Whichever expense category is correct'},
+        {name:'Incorrect Expense Account',statement:'P&L',line:'Removed from prior wrong category'},
+      ],
+      viz:[
+        {stmt:'P&L',section:'Expenses',label:'Correct Account',dir:'up'},
+        {stmt:'P&L',section:'Expenses',label:'Incorrect Account',dir:'down'},
+        {stmt:'P&L',section:'',label:'Net Income',dir:'flat'},
+      ],
+      qbo:"<strong>In QBO:</strong> The cleanest approach is to find the original transaction and re-categorize it directly (Edit > change category). Use a JE only if you're doing a bulk correction or adjusting a prior closed period where editing the original would affect reconciled accounts."
+    },
+    {
+      keywords:['payroll','wages','salary','gusto','run payroll','payroll expense','employee pay','net pay'],
+      title:'Payroll Entry (Gusto / Simplified)',
+      entries:[
+        {type:'DR',account:'Wages / Salaries Expense',amount:'$X,XXX.XX (gross wages)',note:'Total gross pay before any withholdings'},
+        {type:'DR',account:'Payroll Tax Expense',amount:'$XXX.XX (employer taxes)',note:'Employer share of FICA (SS + Medicare)'},
+        {type:'CR',account:'Cash / Checking',amount:'$X,XXX.XX (total pulled by Gusto)',note:'Full amount Gusto debits your bank account'},
+      ],
+      before:'Payroll costs may be missing, partially recorded, or showing up as one lump cash withdrawal with no expense detail.',
+      after:'Gross wages and employer taxes are expensed on the P&L. Cash out matches what Gusto actually pulled from your account.',
+      statements:['P&L','Balance Sheet'],
+      accounts:[
+        {name:'Wages Expense',statement:'P&L',line:'Operating Expenses'},
+        {name:'Payroll Tax Expense',statement:'P&L',line:'Operating Expenses'},
+        {name:'Cash',statement:'Balance Sheet',line:'Current Assets'},
+      ],
+      viz:[
+        {stmt:'P&L',section:'Expenses',label:'Wages Expense (gross)',dir:'up'},
+        {stmt:'P&L',section:'Expenses',label:'Payroll Tax Expense',dir:'up'},
+        {stmt:'P&L',section:'',label:'Net Income',dir:'down'},
+        {stmt:'BS',section:'Current Assets',label:'Cash',dir:'down'},
+      ],
+      qbo:"<strong>In QBO + Gusto:</strong> Gusto's QBO integration can auto-create this JE on each pay run. Confirm in Gusto settings that QBO sync is enabled. Date the JE to match the bank withdrawal date, not the employee pay date, to keep your bank reconciliation clean."
+    },
+    {
+      keywords:['meals','food','entertainment','meals expense','restaurant','business meal'],
+      title:'Record a Meals / Entertainment Expense',
+      entries:[
+        {type:'DR',account:'Meals & Entertainment Expense',amount:'$XXX.XX',note:'Business meal expense on your P&L'},
+        {type:'CR',account:'Cash / Credit Card Payable',amount:'$XXX.XX',note:'Cash out or liability created on the card'},
+      ],
+      before:'The meal may not be recorded, or may be sitting in a general expense account without clear categorization.',
+      after:'The expense hits Meals & Entertainment on your P&L. Note: the IRS generally allows only 50% deduction for business meals — your CPA will handle the tax adjustment.',
+      statements:['P&L'],
+      accounts:[
+        {name:'Meals & Entertainment',statement:'P&L',line:'Operating Expenses'},
+        {name:'Cash or Credit Card Payable',statement:'Balance Sheet',line:'Current Assets / Current Liabilities'},
+      ],
+      viz:[
+        {stmt:'P&L',section:'Expenses',label:'Meals & Entertainment',dir:'up'},
+        {stmt:'P&L',section:'',label:'Net Income',dir:'down'},
+        {stmt:'BS',section:'Current Assets / Liabilities',label:'Cash or Credit Card Payable',dir:'down'},
+      ],
+      qbo:'<strong>In QBO:</strong> Categorize as "Meals and Entertainment." Keep receipts with business purpose documented — who attended and why. Your CPA will apply the 50% limitation at tax time.'
+    },
+    {
+      keywords:['credit card','pay credit card','credit card payment','cc payment','pay off card'],
+      title:'Pay Off a Credit Card Balance',
+      entries:[
+        {type:'DR',account:'Credit Card Payable',amount:'$X,XXX.XX',note:'Reduces the credit card liability on your Balance Sheet'},
+        {type:'CR',account:'Cash / Checking',amount:'$X,XXX.XX',note:'Cash out to pay the card'},
+      ],
+      before:'The credit card balance remains as a liability on the Balance Sheet even though it has been paid.',
+      after:'Both the cash account and the credit card liability are reduced by the same amount. Net equity is unchanged — this is just settling a liability.',
+      statements:['Balance Sheet'],
+      accounts:[
+        {name:'Credit Card Payable',statement:'Balance Sheet',line:'Current Liabilities'},
+        {name:'Cash / Checking',statement:'Balance Sheet',line:'Current Assets'},
+      ],
+      viz:[
+        {stmt:'BS',section:'Current Assets',label:'Cash',dir:'down'},
+        {stmt:'BS',section:'Current Liabilities',label:'Credit Card Payable',dir:'down'},
+        {stmt:'BS',section:'',label:'Total Equity',dir:'flat'},
+      ],
+      qbo:'<strong>In QBO:</strong> Use + New > Pay Down Credit Card. This is the correct QBO workflow. Do not manually JE a credit card payment — the Pay Down Credit Card feature correctly matches the payment to the liability account and keeps your reconciliation clean.'
+    },
+    {
+      keywords:['processing fee','payment processing','stripe','square','paypal','net deposit','processor','merchant fee','net settlement','processing fees','stripe fee','square fee'],
+      title:'Gross Up Revenue for Payment Processing Fees',
+      entries:[
+        {type:'DR',account:'Cash / Checking',amount:'$XXX.XX (net deposit received)',note:'What actually landed in your bank account'},
+        {type:'DR',account:'Payment Processing Fees',amount:'$XX.XX (fee amount)',note:'The fee the processor kept — a real business expense'},
+        {type:'CR',account:'Revenue / Sales',amount:'$XXX.XX (gross transaction amount)',note:'True top-line revenue before the processor took their cut'},
+      ],
+      before:'Revenue is understated because only the net deposit was recorded. Processing fees are invisible — they silently reduced income instead of showing as a real expense.',
+      after:'Revenue reflects the true gross amount your customer paid. Processing fees appear as a legitimate expense on your P&L. Both your top-line and your cost structure are accurate.',
+      statements:['P&L','Balance Sheet'],
+      accounts:[
+        {name:'Revenue / Sales',statement:'P&L',line:'Income — grossed up to full amount'},
+        {name:'Payment Processing Fees',statement:'P&L',line:'Operating Expenses'},
+        {name:'Cash / Checking',statement:'Balance Sheet',line:'Current Assets — net deposit'},
+      ],
+      viz:[
+        {stmt:'P&L',section:'Income',label:'Revenue / Sales (gross)',dir:'up'},
+        {stmt:'P&L',section:'Expenses',label:'Processing Fees',dir:'up'},
+        {stmt:'P&L',section:'',label:'Net Income',dir:'flat'},
+        {stmt:'BS',section:'Current Assets',label:'Cash (net deposit)',dir:'up'},
+      ],
+      qbo:"<strong>In QBO:</strong> Go to + New > Journal Entry. Use your processor's monthly report to get the gross amount and fee breakdown. Some processors (Stripe, Square) have QBO integrations that can automate this. If doing it manually, a single month-end JE using the totals from your processor statement is cleaner than one entry per transaction."
+    },
+    {
+      keywords:['personal card','personal account','owner paid personal','paid from personal','personal payment','not in quickbooks','personal funds','paid out of pocket','reimburs'],
+      title:'Owner Paid Business Expense from Personal Account',
+      entries:[
+        {type:'DR',account:'[Expense Account] (e.g. Office Supplies, Software)',amount:'$XXX.XX',note:'Business expense coded to the correct category on the P&L'},
+        {type:'CR',account:"Owner's Equity / Shareholder Contribution",amount:'$XXX.XX',note:"Owner funded this expense — treated as a contribution to the business"},
+      ],
+      before:'The business expense is missing from the books entirely because it was paid from a personal account that does not connect to QBO.',
+      after:"The expense hits the correct P&L account. Owner equity reflects the contribution. If the owner expects reimbursement in cash, use \"Due to Owner\" (a liability) instead of equity.",
+      statements:['P&L','Balance Sheet'],
+      accounts:[
+        {name:'[Expense Account]',statement:'P&L',line:'Operating Expenses — correct category'},
+        {name:"Owner's Equity / Due to Owner",statement:'Balance Sheet',line:'Equity (contribution) or Current Liabilities (if reimbursing)'},
+      ],
+      viz:[
+        {stmt:'P&L',section:'Expenses',label:'[Expense Account]',dir:'up'},
+        {stmt:'P&L',section:'',label:'Net Income',dir:'down'},
+        {stmt:'BS',section:'Equity',label:"Owner's Equity / Contribution",dir:'up'},
+      ],
+      qbo:"<strong>In QBO:</strong> Key decision: if the owner will be reimbursed by the business in cash, credit \"Due to Owner\" under Current Liabilities instead of equity. If it's a true contribution with no repayment expected, credit an Owner's Equity account. Confirm with the owner which applies — it affects the Balance Sheet differently."
+    },
+    {
+      keywords:['personal expense','business card personal','used business card','personal purchase','personal on business','accidentally used business','personal charge'],
+      title:'Owner Used Business Card for Personal Expense',
+      entries:[
+        {type:'DR',account:'Distributions - Personal Expenses',amount:'$XXX.XX',note:'Sub-account under Distributions — reduces equity, stays off the P&L'},
+        {type:'CR',account:'Credit Card Payable',amount:'$XXX.XX',note:'The charge already hit the business credit card'},
+      ],
+      before:'The personal charge is sitting on the business credit card and may be miscoded as a business expense, polluting your P&L with personal costs.',
+      after:'The charge is correctly removed from business expenses. It lives under Distributions on the Balance Sheet as a reduction in equity — same treatment as a cash draw, just paid via card.',
+      statements:['Balance Sheet'],
+      accounts:[
+        {name:'Distributions - Personal Expenses',statement:'Balance Sheet',line:'Equity Section — contra-equity sub-account'},
+        {name:'Credit Card Payable',statement:'Balance Sheet',line:'Current Liabilities'},
+      ],
+      viz:[
+        {stmt:'BS',section:'Current Liabilities',label:'Credit Card Payable',dir:'up'},
+        {stmt:'BS',section:'Equity',label:'Distributions - Personal',dir:'up'},
+        {stmt:'BS',section:'',label:'Total Equity',dir:'down'},
+      ],
+      qbo:"<strong>In QBO:</strong> Set up a sub-account under Owner's Draw / Distributions called \"Personal Expenses\" for visibility. Never code personal expenses to a P&L account — it overstates expenses and distorts net income."
+    },
+    {
+      keywords:['year end','year-end','annual close','closing entries','end of year','clean up books','close the books','stale','old transactions','uncleared','outstanding check','bank rec cleanup'],
+      title:'Year-End Cleanup — Stale / Uncleared Transactions',
+      entries:[
+        {type:'DR',account:'[Expense or Equity Account]',amount:'$XXX.XX',note:"Depends on what the stale transaction was — expense if a real cost, equity if a draw"},
+        {type:'CR',account:'Cash / Checking',amount:'$XXX.XX',note:'Clears the phantom transaction from the bank reconciliation'},
+      ],
+      before:"Old uncleared checks, phantom deposits, or stale transactions are sitting in the bank rec and making it impossible to reconcile cleanly. The books show a cash balance that doesn't reflect reality.",
+      after:'The bank rec is clean. Cash per books matches (or can be explained against) the bank statement. Financial statements are reliable heading into the new year.',
+      statements:['Balance Sheet'],
+      accounts:[
+        {name:'Cash / Checking',statement:'Balance Sheet',line:'Current Assets'},
+        {name:'Expense or Equity account',statement:'P&L or Balance Sheet',line:'Depends on the nature of the original transaction'},
+      ],
+      viz:[
+        {stmt:'BS',section:'Current Assets',label:'Cash (reconciled)',dir:'flat'},
+        {stmt:'BS',section:'',label:'Outstanding Items Cleared',dir:'down'},
+      ],
+      qbo:"<strong>In QBO:</strong> Run the Reconciliation Discrepancy Report and the Missing Checks Report first to identify stale items. For checks that will never clear (issued 6+ months ago), void the check in QBO to properly reverse the original entry rather than creating a manual JE — this keeps your audit trail clean."
+    },
+    {
+      keywords:['clear suspense','ask my accountant','suspense account','parked','reclassify suspense','uncategorized'],
+      title:'Clear Suspense / Ask My Accountant Account',
+      entries:[
+        {type:'DR',account:'Correct Expense or Asset Account',amount:'$XXX.XX',note:'Where this transaction actually belongs'},
+        {type:'CR',account:'Ask My Accountant / Suspense',amount:'$XXX.XX',note:'Clears the holding account'},
+      ],
+      before:'Transactions are parked in a suspense or "Ask My Accountant" account because their nature was unclear at the time. This account should always be zero at year-end.',
+      after:'Every transaction is coded to its correct account. The suspense account is zeroed out. Your P&L and Balance Sheet reflect real categorizations, not placeholders.',
+      statements:['P&L','Balance Sheet'],
+      accounts:[
+        {name:'Correct Account (varies)',statement:'P&L or Balance Sheet',line:'Wherever the transaction truly belongs'},
+        {name:'Ask My Accountant / Suspense',statement:'Balance Sheet',line:'Should be zero at close'},
+      ],
+      viz:[
+        {stmt:'BS',section:'Other Accounts',label:'Ask My Accountant / Suspense',dir:'down'},
+        {stmt:'BS',section:'',label:'Balance (target: $0.00)',dir:'down'},
+      ],
+      qbo:"<strong>In QBO:</strong> Run a Transaction Detail report filtered to the \"Ask My Accountant\" account. Review each item with the owner or CPA and reclassify accordingly. This account should never carry a balance into the new year — it's a parking lot, not a permanent home."
+    },
+    {
+      keywords:['sales tax','sales tax payable','reconcile sales tax','true up','sales tax liability','owe sales tax'],
+      title:'Sales Tax Payable Reconciliation / True-Up',
+      entries:[
+        {type:'DR',account:'Sales Tax Payable',amount:'$XXX.XX',note:'Clears the liability after remittance to the tax authority'},
+        {type:'CR',account:'Cash / Checking',amount:'$XXX.XX',note:'Payment sent to state tax agency'},
+      ],
+      before:'Sales tax collected from customers is sitting as a liability on the Balance Sheet. The liability balance may not match what was actually remitted, creating a discrepancy.',
+      after:'Sales Tax Payable is zeroed out (or matches only the current period\'s unremitted balance). Balance Sheet is accurate. No phantom tax liability inflating your current liabilities.',
+      statements:['Balance Sheet'],
+      accounts:[
+        {name:'Sales Tax Payable',statement:'Balance Sheet',line:'Current Liabilities'},
+        {name:'Cash / Checking',statement:'Balance Sheet',line:'Current Assets'},
+      ],
+      viz:[
+        {stmt:'BS',section:'Current Assets',label:'Cash',dir:'down'},
+        {stmt:'BS',section:'Current Liabilities',label:'Sales Tax Payable',dir:'down'},
+        {stmt:'BS',section:'',label:'Total Equity',dir:'flat'},
+      ],
+      qbo:'<strong>In QBO:</strong> Use the Sales Tax Center (Taxes > Sales Tax) to manage and record remittances — don\'t manually JE sales tax payments or it will conflict with QBO\'s built-in tracking. At year-end, run the Sales Tax Liability Report and confirm the balance matches what\'s owed to each jurisdiction.'
+    },
+    {
+      keywords:['shopify','stripe deposit sales tax','net deposit sales tax','sales tax not split','processor sales tax','sales tax included deposit','gross up sales tax','shopify deposit','shopify payout'],
+      title:'Gross Up Shopify / Stripe Deposit to Separate Sales Tax',
+      entries:[
+        {type:'DR',account:'Cash / Checking',amount:'$XXX.XX (net deposit received)',note:'What actually landed in your bank — net of sales tax and any fees'},
+        {type:'DR',account:'Payment Processing Fees',amount:'$XX.XX (if applicable)',note:'Processor fees if also bundled into the net deposit'},
+        {type:'CR',account:'Revenue / Sales',amount:'$XXX.XX (gross product revenue)',note:'True sales revenue before tax — what customers paid for goods/services'},
+        {type:'CR',account:'Sales Tax Payable',amount:'$XX.XX (tax collected)',note:'Sales tax belongs to the state — it is a liability, not your income'},
+      ],
+      before:'The full net deposit was recorded as revenue, mixing your actual sales income with sales tax that was collected on behalf of the state. Sales Tax Payable is understated or missing entirely.',
+      after:'Revenue reflects only what you actually earned. Sales Tax Payable sits correctly as a current liability on the Balance Sheet, ready to be remitted. The books accurately separate your money from the state\'s money.',
+      statements:['P&L','Balance Sheet'],
+      accounts:[
+        {name:'Revenue / Sales',statement:'P&L',line:'Income — product/service revenue only'},
+        {name:'Sales Tax Payable',statement:'Balance Sheet',line:'Current Liabilities — owed to the state'},
+        {name:'Payment Processing Fees',statement:'P&L',line:'Operating Expenses (if applicable)'},
+        {name:'Cash / Checking',statement:'Balance Sheet',line:'Current Assets — net deposit'},
+      ],
+      viz:[
+        {stmt:'P&L',section:'Income',label:'Revenue / Sales (clean)',dir:'flat'},
+        {stmt:'P&L',section:'Expenses',label:'Processing Fees (if any)',dir:'up'},
+        {stmt:'BS',section:'Current Assets',label:'Cash (net deposit)',dir:'up'},
+        {stmt:'BS',section:'Current Liabilities',label:'Sales Tax Payable',dir:'up'},
+      ],
+      qbo:'<strong>In QBO:</strong> Go to + New > Journal Entry. Use your Shopify or Stripe payout report to break out gross sales, sales tax collected, and processing fees. This is a common month-end cleanup entry for e-commerce clients. If Shopify collects and remits tax on your behalf (marketplace facilitator), the sales tax line may not apply — confirm with your CPA which states require you to track it vs. which Shopify handles directly.'
+    },
+    {
+      keywords:['pay sales tax','remit sales tax','sales tax payment','send sales tax','pay state tax','sales tax due','sales tax remittance','pay sales tax payable'],
+      title:'Pay / Remit Sales Tax to the State',
+      entries:[
+        {type:'DR',account:'Sales Tax Payable',amount:'$XXX.XX',note:'Reduces the liability — you no longer owe this to the state'},
+        {type:'CR',account:'Cash / Checking',amount:'$XXX.XX',note:'Cash leaving your account to pay the tax authority'},
+      ],
+      before:'Sales Tax Payable is sitting as a current liability on the Balance Sheet representing tax collected from customers that has not yet been sent to the state.',
+      after:'Sales Tax Payable is reduced (or zeroed out). Cash is down by the same amount. This is a pure Balance Sheet event — net income is not affected because the tax was never your revenue to begin with.',
+      statements:['Balance Sheet'],
+      accounts:[
+        {name:'Sales Tax Payable',statement:'Balance Sheet',line:'Current Liabilities — reduced toward zero'},
+        {name:'Cash / Checking',statement:'Balance Sheet',line:'Current Assets'},
+      ],
+      viz:[
+        {stmt:'BS',section:'Current Assets',label:'Cash',dir:'down'},
+        {stmt:'BS',section:'Current Liabilities',label:'Sales Tax Payable',dir:'down'},
+        {stmt:'BS',section:'',label:'Total Equity',dir:'flat'},
+      ],
+      qbo:'<strong>In QBO:</strong> Use Taxes > Sales Tax > Record Payment to remit through the Sales Tax Center. This is the correct QBO workflow and keeps your sales tax tracking in sync. Do not use a manual JE for the remittance or the Sales Tax Center balance will get out of sync with your books. After recording, confirm Sales Tax Payable on your Balance Sheet matches any remaining unremitted balance.'
+    },
+  ];
+
+  // ─── MATCHING ENGINE ─────────────────────────────────────────────────
+  function findMatch(input) {
+    const lower = input.toLowerCase();
+    let best = null, bestScore = 0;
+    for (const entry of JE_LIBRARY) {
+      let score = 0;
+      for (const kw of entry.keywords) { if (lower.includes(kw)) score += kw.split(' ').length; }
+      if (score > bestScore) { bestScore = score; best = entry; }
+    }
+    return bestScore > 0 ? best : null;
+  }
+
+  // ─── STATEMENT VISUAL RENDERER ───────────────────────────────────────
+  function renderViz(viz) {
+    if (!viz || !viz.length) return '';
+    const pl = viz.filter(v => v.stmt === 'P&L');
+    const bs = viz.filter(v => v.stmt === 'BS');
+    const hasPL = pl.length > 0, hasBS = bs.length > 0;
+    const single = !(hasPL && hasBS);
+
+    function dirLabel(d) { return d==='up'?'increases':d==='down'?'decreases':'no change'; }
+
+    function buildMini(rows, type) {
+      const tc = type==='pl'?'pl-title':'bs-title';
+      const tt = type==='pl'?'Profit &amp; Loss':'Balance Sheet';
+      let h = `<div class="stmt-mini"><div class="stmt-mini-title ${tc}">${tt}</div>`;
+      let lastSec = null;
+      for (const row of rows) {
+        if (row.section && row.section !== lastSec) {
+          h += `<div class="stmt-viz-section">${row.section}</div>`;
+          lastSec = row.section;
+        }
+        const isTotal = !row.section;
+        h += `<div class="stmt-viz-row ${isTotal?'total-row':'highlighted'}">
+          <span class="row-label">${row.label}</span>
+          <span class="dir ${row.dir}">${dirLabel(row.dir)}</span>
+        </div>`;
+      }
+      return h + '</div>';
+    }
+
+    let h = `<div class="stmt-viz${single?' single':''}">`;
+    if (hasPL) h += buildMini(pl, 'pl');
+    if (hasBS) h += buildMini(bs, 'bs');
+    return h + '</div>';
+  }
+
+  // ─── GENERATE + RENDER ───────────────────────────────────────────────
+  function generateJE() {
+    const input = document.getElementById('je-input').value.trim();
+    if (!input) return;
+    const out = document.getElementById('je-output');
+    const btn = document.getElementById('gen-btn');
+    btn.disabled = true;
+    out.innerHTML = `<div class="loading"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><span>Looking up your journal entry...</span></div>`;
+    setTimeout(() => {
+      const match = findMatch(input);
+      if (!match) {
+        out.innerHTML = `<div class="no-match"><p>We didn't find an exact match for that scenario. <strong>Try rephrasing</strong> using terms like the account names involved, or pick one of the quick examples above.</p><p style="margin-top:12px;">For complex or unusual entries, we recommend working directly with your bookkeeper or scheduling a call with our team.</p></div>`;
+      } else {
+        out.innerHTML = renderResult(match);
+      }
+      btn.disabled = false;
+    }, 500);
+  }
+
+  function renderResult(m) {
+    const entriesHTML = m.entries.map(e => `
+      <div class="je-row">
+        <div class="je-account ${e.type==='CR'?'cr':''}">${e.account}</div>
+        <div><span class="badge ${e.type==='DR'?'badge-dr':'badge-cr'}">${e.type}</span></div>
+        <div class="je-amount">${e.amount}</div>
+        <div class="je-note">${e.note}</div>
+      </div>`).join('');
+
+    const stmtsHTML = (m.statements||[]).map(s =>
+      `<span class="stmt-badge ${s==='P&L'?'pl':'bs'}">${s}</span>`).join('');
+
+    const accountsHTML = (m.accounts||[]).map(a => `
+      <div class="account-row">
+        <div class="account-name">${a.name}</div>
+        <div class="account-stmt">${a.statement}</div>
+        <div class="account-line">${a.line}</div>
+      </div>`).join('');
+
+    const vizHTML = renderViz(m.viz);
+
+    return `<div class="result">
+      <div class="result-section">
+        <div class="summary-box">${m.title} — ${m.before.split('.')[0]}.</div>
+      </div>
+      <div class="result-section">
+        <div class="section-label">Journal Entry</div>
+        <div class="je-card">
+          <div class="je-header"><div>Account</div><div>Type</div><div style="text-align:right">Amount</div></div>
+          ${entriesHTML}
+        </div>
+      </div>
+      <div class="result-section">
+        <div class="section-label">Before &amp; After</div>
+        <div class="impact-grid">
+          <div class="impact-card"><div class="ic-label">Before this entry</div><div class="ic-text">${m.before}</div></div>
+          <div class="impact-card"><div class="ic-label">After this entry</div><div class="ic-text">${m.after}</div></div>
+        </div>
+      </div>
+      ${vizHTML ? `<div class="result-section"><div class="section-label">Financial Statement Impact</div>${vizHTML}</div>` : ''}
+      <div class="result-section">
+        <div class="section-label">Statements Affected</div>
+        <div class="statements-row">${stmtsHTML}</div>
+      </div>
+      <div class="result-section">
+        <div class="section-label">Where It Shows Up</div>
+        <div class="accounts-box">${accountsHTML}</div>
+      </div>
+      <div class="result-section">
+        <div class="qbo-box">${m.qbo}</div>
+      </div>
+    </div>`;
+  }
+
+  document.getElementById('je-input').addEventListener('keydown', function(e) {
+    if (e.key==='Enter' && !e.shiftKey) { e.preventDefault(); generateJE(); }
+  });
+</script>
+</body>
+</html>
